@@ -162,7 +162,7 @@ unsigned int
 rl_agent_action(unsigned int state, double reward)
 {
 	// For unseen states state
-	if (stat_freq[state] == 0) 
+	if (state_freq[state] == 0) 
 	{
 		utilities[state] = reward;
 	}
@@ -170,11 +170,11 @@ rl_agent_action(unsigned int state, double reward)
 	// Ignore previously null states
 	if (prevValid == true) 
 	{
-		(state_freq[prevState])++;
+		state_freq[prevState] = state_freq[prevState] + 1;
 		double stepSize = updateWeight (state_freq[prevState]);
 		double addedUtility = prevReward + gamma * utilities[state] - 
 			utilities[prevState];
-		utilities[prevState] += stepSize * addedUtility;
+		utilities[prevState] = utilities[prevState] + stepSize * addedUtility;
 	}
 
 	// Terminal state case
@@ -187,9 +187,10 @@ rl_agent_action(unsigned int state, double reward)
 		prevState = state;
 		prevAction = policy[state];
 		prevReward = reward;
+		prevValid = true;
 	}
 
-  return policy[state]; // Return the policy action for the state
+  return prevAction; // Return the policy action for the state
 } // rl_agent_action
 
 /*

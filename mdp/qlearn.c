@@ -165,23 +165,26 @@ unsigned int rl_agent_action(unsigned int state, double reward)
 	double qStar;
 	unsigned int numActions = p_mdp->numAvailableActions[state];
 
+	printf ("numavailableactions = %u\n", numActions);
+	printf ("numactions = %u\n", p_mdp->numActions);
+
 	// terminal state case
 	if (p_mdp->terminal[state]) 
 	{
 		for (unsigned int action = 0; action < numActions; action++)
 		{
 			unsigned int actionVal = p_mdp->actions[state][action];
-			state_action_value[state][action] = reward;
+			state_action_value[state][actionVal] = reward;
 		}
 		qStar = reward;
 	}
 	else
 	{
-		qStar = max_value (numActions, p_mdp->actions[state], state_action_value);
+		qStar = max_value (numActions, p_mdp->actions[state], state_action_value[state]);
 	}
 
 	// ignore null previous states
-	if (prevValid = true)
+	if (prevValid == true)
 	{
 		(state_action_freq[prevState][prevAction])++;
 		double stepSize = updateWeight (state_action_freq[prevState][prevAction]);
@@ -208,7 +211,7 @@ unsigned int rl_agent_action(unsigned int state, double reward)
 		{
 			unsigned int actionVal = p_mdp->actions[state][action];
 			expVal = exploration_function (
-					state_action_value[state,actionVal],
+					state_action_value[state][actionVal],
 					state_action_freq[state][actionVal]);
 			if (expVal > bestExpVal)
 			{
@@ -218,15 +221,8 @@ unsigned int rl_agent_action(unsigned int state, double reward)
 		}
 		prevAction = bestAction;
 	}
-  /*
-  // Return a random, valid action for the given state
-  if (p_mdp->numAvailableActions[state] > 0 )
-    return p_mdp->actions[state]
-                         [(unsigned int)(random() %  
-					 p_mdp->numAvailableActions[state])];
-  else
-    return 0; // No valid action, so no meaningful value to return.
-  */
+
+	return prevAction;
 }
 
 

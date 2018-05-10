@@ -165,9 +165,6 @@ unsigned int rl_agent_action(unsigned int state, double reward)
 	double qStar;
 	unsigned int numActions = p_mdp->numAvailableActions[state];
 
-	printf ("numavailableactions = %u\n", numActions);
-	printf ("numactions = %u\n", p_mdp->numActions);
-
 	// terminal state case
 	if (p_mdp->terminal[state]) 
 	{
@@ -188,9 +185,9 @@ unsigned int rl_agent_action(unsigned int state, double reward)
 	{
 		(state_action_freq[prevState][prevAction])++;
 		double stepSize = updateWeight (state_action_freq[prevState][prevAction]);
-		double addedQ = reward + gamma * qStar - 
+		double addedQ = prevReward + gamma * qStar - 
 			state_action_value[prevState][prevAction];
-		state_action_value[prevState][prevAction] = stepSize * addedQ;
+		state_action_value[prevState][prevAction] += stepSize * addedQ;
 	}
 
 	// terminal state case
@@ -220,6 +217,7 @@ unsigned int rl_agent_action(unsigned int state, double reward)
 			}
 		}
 		prevAction = bestAction;
+		prevValid = true;
 	}
 
 	return prevAction;

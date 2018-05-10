@@ -1,0 +1,23 @@
+;; Lab: Markov Decision Processes
+;; CSC 261 
+;;
+;; File
+;;   references.txt
+;;
+;; Summary
+;;   Sources consulted to complete Lab: 11 CSC261 S18
+;;
+References:
+  Written/online sources used:
+    Artificial Intellegince: A Modern Appraoch (Ed. 3) Russell & Norvig, 2013
+         Chapter 17, 21
+    All starter and background code provided by Jerod Weinman, Grinnell College
+    Analysis done using Instructors compiled and completed code 
+  Help obtained:
+    Mentor Prabir consulted on how to interpret seg faults
+
+Academic honesty certification:
+  Our initials below confirm that the above list of sources
+  is complete AND that I/we have not talked to anyone else
+  (e.g., CSC 261 students) about the solution to this problem
+  Initials:  AL, EA

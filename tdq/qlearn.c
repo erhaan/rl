@@ -162,63 +162,7 @@ double exploration_function( double u, double n )
  */
 unsigned int rl_agent_action(unsigned int state, double reward)
 {
-	double qStar;
-	unsigned int numActions = p_mdp->numAvailableActions[state];
 
-	// terminal state case
-	if (p_mdp->terminal[state]) 
-	{
-		for (unsigned int action = 0; action < numActions; action++)
-		{
-			unsigned int actionVal = p_mdp->actions[state][action];
-			state_action_value[state][action] = reward;
-		}
-		qStar = reward;
-	}
-	else
-	{
-		qStar = max_value (numActions, p_mdp->actions[state], state_action_value);
-	}
-
-	// ignore null previous states
-	if (prevValid = true)
-	{
-		(state_action_freq[prevState][prevAction])++;
-		double stepSize = updateWeight (state_action_freq[prevState][prevAction]);
-		double addedQ = reward + gamma * qStar - 
-			state_action_value[prevState][prevAction];
-		state_action_value[prevState][prevAction] = stepSize * addedQ;
-	}
-
-	// terminal state case
-	if (p_mdp->terminal[state])
-	{
-		prevValid = false;
-	}
-	else
-	{
-		prevState = state;
-		prevReward = reward;
-
-		// find highest exploration value
-		double expVal;
-		double bestExpVal = 0;
-		unsigned int bestAction;
-		for (unsigned int action = 0; action < numActions; action++)
-		{
-			unsigned int actionVal = p_mdp->actions[state][action];
-			expVal = exploration_function (
-					state_action_value[state,actionVal],
-					state_action_freq[state][actionVal]);
-			if (expVal > bestExpVal)
-			{
-				bestExpVal = expVal;
-				bestAction = actionVal;
-			}
-		}
-		prevAction = bestAction;
-	}
-  /*
   // Return a random, valid action for the given state
   if (p_mdp->numAvailableActions[state] > 0 )
     return p_mdp->actions[state]
@@ -226,7 +170,7 @@ unsigned int rl_agent_action(unsigned int state, double reward)
 					 p_mdp->numAvailableActions[state])];
   else
     return 0; // No valid action, so no meaningful value to return.
-  */
+  
 }
 
 

@@ -161,34 +161,6 @@ updateWeight (double freq)
 unsigned int
 rl_agent_action(unsigned int state, double reward)
 {
-	// For unseen states state
-	if (stat_freq[state] == 0) 
-	{
-		utilities[state] = reward;
-	}
-
-	// Ignore previously null states
-	if (prevValid == true) 
-	{
-		(state_freq[prevState])++;
-		double stepSize = updateWeight (state_freq[prevState]);
-		double addedUtility = prevReward + gamma * utilities[state] - 
-			utilities[prevState];
-		utilities[prevState] += stepSize * addedUtility;
-	}
-
-	// Terminal state case
-	if (p_mdp->terminal[state])
-	{
-		prevValid = false;
-	} 
-	else 
-	{
-		prevState = state;
-		prevAction = policy[state];
-		prevReward = reward;
-	}
-
   return policy[state]; // Return the policy action for the state
 } // rl_agent_action
 

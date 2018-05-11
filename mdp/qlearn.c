@@ -3,7 +3,6 @@
 #include <errno.h>
 #include <string.h>
 #include <stdbool.h>
-#include <math.h>
 
 #include "mdp.h"
 #include "environment.h"
@@ -204,7 +203,7 @@ unsigned int rl_agent_action(unsigned int state, double reward)
 
       // find highest exploration value
       double expVal;
-      double bestExpVal = -INFINITY;
+      double bestExpVal = -1.0/0.0;
       unsigned int bestAction;
       for (unsigned int action = 0; action < numAvailActions; action++)
         {

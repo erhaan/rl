@@ -1,0 +1,2 @@
+make qlearn
+./qlearn 0.99 0.1 200 4x3.mdp 1000

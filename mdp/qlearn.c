@@ -162,77 +162,77 @@ double exploration_function( double u, double n )
  */
 unsigned int rl_agent_action(unsigned int state, double reward)
 {
-	double qStar;
-	unsigned int numActions = p_mdp->numAvailableActions[state];
+  double qStar;
+  bool terminal = p_mdp->terminal[state];
+  unsigned int numAvailActions = p_mdp->numAvailableActions[state];
+  
+  // terminal state case
+  if (terminal) 
+    {
+      for (unsigned int action = 0; action < p_mdp->numActions; action++)
+        {
+          state_action_value[state][action] = reward;
+        }
+      qStar = reward;
+    }
+  else
+    {
+      qStar = max_value (numAvailActions, p_mdp->actions[state],
+                         state_action_value[state]);
+    }
 
-	// terminal state case
-	if (p_mdp->terminal[state]) 
-	{
-		for (unsigned int action = 0; action < numActions; action++)
-		{
-			unsigned int actionVal = p_mdp->actions[state][action];
-			state_action_value[state][actionVal] = reward;
-		}
-		qStar = reward;
-	}
-	else
-	{
-		qStar = max_value (numActions, p_mdp->actions[state], state_action_value[state]);
-	}
+  // ignore null previous states
+  if (prevValid)
+    {
+      (state_action_freq[prevState][prevAction])++;
+      double stepSize = updateWeight (state_action_freq[prevState][prevAction]);
+      double addedQ = prevReward + gamma * qStar - 
+        state_action_value[prevState][prevAction];
+      state_action_value[prevState][prevAction] += stepSize * addedQ;
+    }
 
-	// ignore null previous states
-	if (prevValid == true)
-	{
-		(state_action_freq[prevState][prevAction])++;
-		double stepSize = updateWeight (state_action_freq[prevState][prevAction]);
-		double addedQ = prevReward + gamma * qStar - 
-			state_action_value[prevState][prevAction];
-		state_action_value[prevState][prevAction] += stepSize * addedQ;
-	}
+  // terminal state case
+  if (terminal)
+    {
+      prevValid = false;
+    }
+  else
+    {
+      prevState = state;
+      prevReward = reward;
 
-	// terminal state case
-	if (p_mdp->terminal[state])
-	{
-		prevValid = false;
-	}
-	else
-	{
-		prevState = state;
-		prevReward = reward;
-
-		// find highest exploration value
-		double expVal;
-		double bestExpVal = 0;
-		unsigned int bestAction;
-		for (unsigned int action = 0; action < numActions; action++)
-		{
-			unsigned int actionVal = p_mdp->actions[state][action];
-			expVal = exploration_function (
-					state_action_value[state][actionVal],
-					state_action_freq[state][actionVal]);
-			if (expVal > bestExpVal)
-			{
-				bestExpVal = expVal;
-				bestAction = actionVal;
-			}
-		}
-		prevAction = bestAction;
-		prevValid = true;
-	}
-
-	return prevAction;
+      // find highest exploration value
+      double expVal;
+      double bestExpVal = -Inf;
+      unsigned int bestAction;
+      for (unsigned int action = 0; action < numAvailActions; action++)
+        {
+          unsigned int actionVal = p_mdp->actions[state][action];
+          expVal = exploration_function (state_action_value[state][actionVal],
+                                         state_action_freq[state][actionVal]);
+          if (expVal > bestExpVal)
+            {
+              bestExpVal = expVal;
+              bestAction = actionVal;
+            }
+        }
+      prevAction = bestAction;
+      prevValid = true;
+    }
+  
+  return prevAction;
 }
 
 
 /*
- Usage: qlearn gamma reward attempts mdpfile trials
+  Usage: qlearn gamma reward attempts mdpfile trials
  
- Runs Q-Learning-Agent in an environment for the given number of
- trials with an exploration function that uses reward as an optimistic
- estimate when the number of state-action experiences is less than
- attempts.
+  Runs Q-Learning-Agent in an environment for the given number of
+  trials with an exploration function that uses reward as an optimistic
+  estimate when the number of state-action experiences is less than
+  attempts.
 
- Author: Jerod Weinman
+  Author: Jerod Weinman
 */
 int
 main (int argc, char* argv[])
@@ -258,11 +258,11 @@ main (int argc, char* argv[])
   // Print values
   printf("Q[s,a]\n");
   for ( state=0 ; state < p_mdp->numStates ; state++)
-  {
-    for ( action=0 ; action < p_mdp->numActions ; action++)
-      printf ("%1.3f\t",state_action_value[state][action]);
-    printf ("\n");
-  }
+    {
+      for ( action=0 ; action < p_mdp->numActions ; action++)
+        printf ("%1.3f\t",state_action_value[state][action]);
+      printf ("\n");
+    }
 
   // Print utilities
   printf("\nU[s]\n");
@@ -304,11 +304,11 @@ process_args (int argc, char * argv[],
               unsigned int * trials)
 {
   if (argc != 6)
-  {
-    fprintf (stderr,
-             "Usage: %s gamma reward attempts mdpfile trials\n", argv[0]);
-    exit (EXIT_FAILURE);
-  }
+    {
+      fprintf (stderr,
+               "Usage: %s gamma reward attempts mdpfile trials\n", argv[0]);
+      exit (EXIT_FAILURE);
+    }
 
   char * endptr; // String End Location for number parsing
 
@@ -316,39 +316,39 @@ process_args (int argc, char * argv[],
   *gamma = strtod (argv[1], &endptr);
 
   if ( (endptr - argv[1])/sizeof(char) < strlen (argv[1]) )
-  {
-    fprintf (stderr, "%s: Illegal non-numeric value in argument gamma=%s\n",
-             argv[0], argv[1]);
-    exit (EXIT_FAILURE);
-  }
+    {
+      fprintf (stderr, "%s: Illegal non-numeric value in argument gamma=%s\n",
+               argv[0], argv[1]);
+      exit (EXIT_FAILURE);
+    }
 
   // Read optimistic reward as a double
   *reward = strtod (argv[2], &endptr);
 
   if ( (endptr - argv[2])/sizeof(char) < strlen (argv[2]) )
-  {
-    fprintf (stderr, "%s: Illegal non-numeric value in argument reward=%s\n",
-             argv[0], argv[2]);
-    exit (EXIT_FAILURE);
-  }
+    {
+      fprintf (stderr, "%s: Illegal non-numeric value in argument reward=%s\n",
+               argv[0], argv[2]);
+      exit (EXIT_FAILURE);
+    }
 
   // Read number of attempts to require as a double
   *attempts = strtod (argv[3], &endptr);
 
   if ( (endptr - argv[3])/sizeof(char) < strlen (argv[3]) )
-  {
-    fprintf (stderr, "%s: Illegal non-numeric value in argument attempts=%s\n",
-             argv[0], argv[3]);
-    exit (EXIT_FAILURE);
-  }
+    {
+      fprintf (stderr, "%s: Illegal non-numeric value in argument attempts=%s\n",
+               argv[0], argv[3]);
+      exit (EXIT_FAILURE);
+    }
   
   // Read trials, number of times to run as an unsigned integer
   *trials = (unsigned int)strtol(argv[5], &endptr, 10);
   
   if ( (endptr - argv[5])/sizeof(char) < strlen (argv[5]) )
-  {
-    fprintf (stderr, "%s: Illegal non-numeric value in argument trials=%s\n",
-             argv[0], argv[5]);
-    exit (EXIT_FAILURE);
-  }
+    {
+      fprintf (stderr, "%s: Illegal non-numeric value in argument trials=%s\n",
+               argv[0], argv[5]);
+      exit (EXIT_FAILURE);
+    }
 } // process_args

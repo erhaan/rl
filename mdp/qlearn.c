@@ -1,3 +1,16 @@
+/*
+;; Lab: Reinforcement Learning
+;; CSC 261 
+;;
+;; File
+;;   qlearn.c
+;;
+;; Summary
+;;   Documentation and implementation of the qlearn learner
+;;      Written by Jerod Weinman except rl_agent_action
+;;   Implementation of rl_agent_action by anonymous students
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
